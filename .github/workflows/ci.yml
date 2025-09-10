@@ -1,0 +1,90 @@
+name: straps-ci
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feat/**
+      - chore/**
+      - fix/**
+  pull_request:
+    branches:
+      - main
+      - develop
+      - feat/**
+      - chore/**
+      - fix/**
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test on ${{ matrix.platform }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - platform: ubuntu-latest
+            container: ubuntu:latest
+          - platform: ubuntu-rolling
+            container: ubuntu:rolling
+          - platform: fedora-latest
+            container: fedora:latest
+      fail-fast: false
+    
+    container: ${{ matrix.container }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Bash environment
+      shell: bash
+      run: |
+        bash --version
+        echo "Bash version check completed on ${{ matrix.platform }}"
+    
+    - name: Install dependencies
+      shell: bash
+      run: |
+        if command -v apt-get >/dev/null 2>&1; then
+          # Ubuntu/Debian
+          apt-get update
+          apt-get install -y shellcheck git make
+        elif command -v dnf >/dev/null 2>&1; then
+          # Fedora
+          dnf install -y ShellCheck git make
+        fi
+        
+        # Verify installations
+        shellcheck --version
+        echo "All dependencies installed successfully on ${{ matrix.platform }}"
+    
+    - name: Install test dependencies
+      shell: bash
+      run: |
+        echo "Installing BATS and dependencies..."
+        make libs
+        echo "Dependencies installed successfully"
+    
+    - name: Run all tests
+      shell: bash
+      run: |
+        echo "Starting comprehensive test suite..."
+        make all
+        echo "✅ All tests completed successfully"
+    
+    - name: Run validation checks
+      shell: bash
+      run: |
+        echo "Running validation and linting..."
+        make validate
+        echo "✅ Validation completed successfully"
+    
+    - name: Test summary
+      shell: bash
+      run: |
+        echo "🎉 All checks passed on ${{ matrix.platform }}"
+        echo "- All tests passing"
+        echo "- Syntax validation successful" 
+        echo "- ShellCheck validation successful"
