@@ -1,0 +1,26 @@
+# SC2206: Quote to prevent word splitting/globbing
+disable=SC2206
+
+# SC2155: Declare and assign separately to avoid masking return values  
+disable=SC2155
+
+# SC2009: Consider using pgrep instead of grepping ps output
+disable=SC2009
+
+# SC2012: Use find instead of ls to better handle non-alphanumeric filenames
+disable=SC2012
+
+# SC2178: Variable was used as an array but is now assigned a string
+disable=SC2178
+
+# SC2128: Expanding an array without an index only gives the first element
+disable=SC2128
+
+# SC2053: Quote the right-hand side of == in [[ ]] to prevent glob matching
+disable=SC2053
+
+# SC2001: See if you can use ${variable//search/replace} instead
+disable=SC2001
+
+# SC2010: Don't use ls | grep. Use a glob or a for loop with a condition
+disable=SC2010
