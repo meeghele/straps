@@ -19,7 +19,7 @@ on:
 
 jobs:
   test:
-    name: Test on ${{ matrix.platform }}
+    name: test on ${{ matrix.platform }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -35,16 +35,16 @@ jobs:
     container: ${{ matrix.container }}
     
     steps:
-    - name: Checkout code
+    - name: checkout code
       uses: actions/checkout@v4
     
-    - name: Set up Bash environment
+    - name: set up bash environment
       shell: bash
       run: |
         bash --version
         echo "Bash version check completed on ${{ matrix.platform }}"
     
-    - name: Install dependencies
+    - name: install dependencies
       shell: bash
       run: |
         if command -v apt-get >/dev/null 2>&1; then
@@ -60,28 +60,28 @@ jobs:
         shellcheck --version
         echo "All dependencies installed successfully on ${{ matrix.platform }}"
     
-    - name: Install test dependencies
+    - name: install test dependencies
       shell: bash
       run: |
         echo "Installing BATS and dependencies..."
         make libs
         echo "Dependencies installed successfully"
     
-    - name: Run all tests
+    - name: run all tests
       shell: bash
       run: |
         echo "Starting comprehensive test suite..."
         make all
         echo "✅ All tests completed successfully"
     
-    - name: Run validation checks
+    - name: run validation checks
       shell: bash
       run: |
         echo "Running validation and linting..."
         make validate
         echo "✅ Validation completed successfully"
     
-    - name: Test summary
+    - name: test summary
       shell: bash
       run: |
         echo "🎉 All checks passed on ${{ matrix.platform }}"
