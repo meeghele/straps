@@ -3,6 +3,7 @@
 # Licensed under the MIT License. See LICENSE file for details.
 
 load ../harness
+load test_helpers
 
 setup() {
   # Create test data for performance tests
@@ -208,11 +209,14 @@ teardown() {
 @test "can_connect_to performance with multiple connections" {
   # Test multiple rapid connections to known good endpoints
   # Note: Be respectful and don't hammer servers
-  
+  skip_if_ci_with_reason "UDP connectivity unreliable in CI containers"
+  skip_if_missing_nc
+  skip_if_no_network
+
   for i in {1..5}; do
     run can_connect_to "1.1.1.1" 53 udp
     [ "$status" -eq 0 ]
-    
+
     # Small delay to be respectful
     sleep 0.1
   done
@@ -221,7 +225,8 @@ teardown() {
 @test "can_connect_to performance with timeout scenarios" {
   # Test connection attempts to unreachable addresses
   # These should timeout quickly due to /dev/tcp mechanism
-  
+  skip_if_ci_with_reason "Timeout behavior unreliable in CI containers"
+
   for i in {1..10}; do
     run can_connect_to "192.0.2.$i" 12345 tcp  # RFC5737 test network
     [ "$status" -eq 1 ]
