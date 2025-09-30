@@ -30,6 +30,10 @@ jobs:
             container: ubuntu:rolling
           - platform: fedora-latest
             container: fedora:latest
+          - platform: alpine-latest
+            container: alpine:latest
+          - platform: alpine-edge
+            container: alpine:edge
       fail-fast: false
     
     container: ${{ matrix.container }}
@@ -39,15 +43,26 @@ jobs:
       uses: actions/checkout@v4
     
     - name: set up bash environment
-      shell: bash
+      shell: sh
       run: |
+        # Install bash for Alpine if not present
+        if [ -f /etc/alpine-release ] && ! command -v bash >/dev/null 2>&1; then
+          apk update
+          apk add --no-cache bash
+        fi
+
+        # Now check bash version
         bash --version
         echo "Bash version check completed on ${{ matrix.platform }}"
     
     - name: install dependencies
       shell: bash
       run: |
-        if command -v apt-get >/dev/null 2>&1; then
+        if [ -f /etc/alpine-release ]; then
+          # Alpine Linux
+          apk update
+          apk add --no-cache bash shellcheck git make coreutils ncurses netcat-openbsd
+        elif command -v apt-get >/dev/null 2>&1; then
           # Ubuntu/Debian
           apt-get update
           apt-get install -y shellcheck git make
@@ -55,7 +70,7 @@ jobs:
           # Fedora
           dnf install -y ShellCheck git make
         fi
-        
+
         # Verify installations
         shellcheck --version
         echo "All dependencies installed successfully on ${{ matrix.platform }}"
